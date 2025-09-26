@@ -1,0 +1,34 @@
+{
+  "name": "n8n Codespace",
+
+  // Use your compose.yaml file as the base for the environment.
+  "dockerComposeFile": [
+    "../compose.yaml"
+  ],
+
+  // The primary service for VS Code to connect to.
+  "service": "n8n",
+
+  // The folder to open in the VS Code editor.
+  "workspaceFolder": "/workspace",
+
+  // This feature is REQUIRED to run docker/docker-compose commands
+  // inside your Codespace terminal.
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+
+  // Your startup sequence, now pointing to the correct compose.yaml file.
+  "postCreateCommand": "docker-compose -f ../compose.yaml pull && docker-compose -f ../compose.yaml build --no-cache && docker-compose -f ../compose.yaml up -d --remove-orphans && docker image prune -f",
+
+  // Forward the n8n port so you can access it from your browser.
+  "forwardPorts": [5678],
+
+  // Configure the forwarded port for a better user experience.
+  "portsAttributes": {
+    "5678": {
+      "label": "n8n",
+      "onAutoForward": "openBrowser"
+    }
+  }
+}
