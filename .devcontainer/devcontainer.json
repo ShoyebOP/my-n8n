@@ -1,26 +1,23 @@
 {
   "name": "n8n Codespace",
 
-  // Use a standard Microsoft-provided image that comes with useful tools.
+  // 1. Use a standard base image.
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
 
-  // This feature is the key. It installs Docker and Docker Compose
-  // inside your Codespace, allowing you to run your services.
+  // 2. Add the Docker-in-Docker feature.
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   },
 
-  // This command runs AFTER the container is created.
-  // It will build and start your n8n services in the background.
+  // 3. Run your compose file AFTER the Codespace is fully created.
+  // This is the most important part.
   "postCreateCommand": "docker-compose -f compose.yaml up -d --build",
 
-  // This keeps your VS Code terminal from closing after the command runs.
+  // 4. Keep the container running.
   "shutdownAction": "none",
 
-  // Forward the n8n port so you can access it.
+  // 5. Forward the n8n port.
   "forwardPorts": [5678],
-
-  // Configure the forwarded port to open in your browser automatically.
   "portsAttributes": {
     "5678": {
       "label": "n8n",
