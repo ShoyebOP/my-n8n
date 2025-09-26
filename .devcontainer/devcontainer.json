@@ -1,37 +1,26 @@
 {
   "name": "n8n Codespace",
 
-  // Use your compose.yaml file as the base for the environment.
-  "dockerComposeFile": [
-    "../compose.yaml"
-  ],
+  // Use a standard Microsoft-provided image that comes with useful tools.
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
 
-  // The primary service for VS Code to connect to.
-  "service": "n8n",
-
-  // The folder to open in the VS Code editor.
-  "workspaceFolder": "/workspace",
-
-  // This tells Codespaces to run 'docker-compose up -d --build' automatically.
-  // This is the standard way to build and start your services.
-  "runServices": [
-    "n8n"
-  ],
-
-  // This feature is still useful if you want to run manual docker commands.
+  // This feature is the key. It installs Docker and Docker Compose
+  // inside your Codespace, allowing you to run your services.
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   },
 
-  // (Optional) If you still want to prune images after startup,
-  // this is the correct hook. It runs after everything is attached.
-  "postAttachCommand": "docker image prune -f",
+  // This command runs AFTER the container is created.
+  // It will build and start your n8n services in the background.
+  "postCreateCommand": "docker-compose -f compose.yaml up -d --build",
 
+  // This keeps your VS Code terminal from closing after the command runs.
+  "shutdownAction": "none",
 
-  // Forward the n8n port so you can access it from your browser.
+  // Forward the n8n port so you can access it.
   "forwardPorts": [5678],
 
-  // Configure the forwarded port for a better user experience.
+  // Configure the forwarded port to open in your browser automatically.
   "portsAttributes": {
     "5678": {
       "label": "n8n",
