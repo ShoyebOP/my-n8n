@@ -17,7 +17,7 @@ services:
       - TZ=Asia/Dhaka
     volumes:
       - n8n_data:/home/node/.n8n
-      - /home/coo/n8n-compose/local-files:/home/node/files
+      - ./local-files:/home/node/files
     networks:
       - n8n-internal
 
