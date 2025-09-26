@@ -12,14 +12,21 @@
   // The folder to open in the VS Code editor.
   "workspaceFolder": "/workspace",
 
-  // This feature is REQUIRED to run docker/docker-compose commands
-  // inside your Codespace terminal.
+  // This tells Codespaces to run 'docker-compose up -d --build' automatically.
+  // This is the standard way to build and start your services.
+  "runServices": [
+    "n8n"
+  ],
+
+  // This feature is still useful if you want to run manual docker commands.
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   },
 
-  // Your startup sequence, now pointing to the correct compose.yaml file.
-  "postCreateCommand": "docker-compose -f ../compose.yaml pull && docker-compose -f ../compose.yaml build --no-cache && docker-compose -f ../compose.yaml up -d --remove-orphans && docker image prune -f",
+  // (Optional) If you still want to prune images after startup,
+  // this is the correct hook. It runs after everything is attached.
+  "postAttachCommand": "docker image prune -f",
+
 
   // Forward the n8n port so you can access it from your browser.
   "forwardPorts": [5678],
