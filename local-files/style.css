@@ -1,0 +1,18 @@
+/* style.css */
+body {
+    /* No font-family specified; use browser default */
+}
+
+ul, ol {
+    padding-left: 2.5em; /* Slightly increased for better indentation */
+    list-style-position: outside; /* Ensures bullets/numbers appear */
+}
+
+li {
+    list-style-type: disc;
+    margin-bottom: 0.5em;
+}
+
+ol li {
+    list-style-type: decimal;
+}

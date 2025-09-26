@@ -1,0 +1,99 @@
+services:
+  n8n:
+    image: docker.n8n.io/n8nio/n8n
+    restart: always
+    # bind to 127.0.0.1 so it's only accessible from the host
+    ports:
+      - "127.0.0.1:5678:5678"
+    environment:
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+      - N8N_HOST=${SUBDOMAIN}.${DOMAIN_NAME}
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=https
+      - N8N_RUNNERS_ENABLED=true
+      - NODE_ENV=production
+      - WEBHOOK_URL=https://${SUBDOMAIN}.${DOMAIN_NAME}/
+      - GENERIC_TIMEZONE=${GENERIC_TIMEZONE}
+      - TZ=${GENERIC_TIMEZONE}
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - /home/coo/n8n-compose/local-files:/home/node/files
+    networks:
+      - n8n-internal
+
+  pandoc-service:
+    build:
+      context: .
+      dockerfile: ./pandoc-service/Dockerfile
+    restart: always
+    container_name: pandoc-service
+    volumes:
+      - ./local-files:/files
+    networks:
+      - n8n-internal
+    # --- CPU LIMIT ADDED ---
+    deploy:
+      resources:
+        limits:
+          # Limit this container to 1.6 CPU cores (80% of 2 total cores)
+          cpus: '1.0'
+
+  ytdlp-service:
+    build:
+      context: .
+      dockerfile: ./ytdlp-service/Dockerfile
+    restart: always
+    container_name: ytdlp-service
+    volumes:
+      # Mount the shared volume so it can download files there
+      - ./local-files:/files
+    networks:
+      - n8n-internal
+    # --- CPU LIMIT ADDED ---
+    deploy:
+      resources:
+        limits:
+          # Limit this container to 1.6 CPU cores (80% of 2 total cores)
+          cpus: '2.5'
+
+  puppeteer-service:
+    build:
+      context: .
+      dockerfile: ./puppeteer-service/Dockerfile
+    restart: always
+    container_name: puppeteer-service
+    volumes:
+      - ./local-files:/files
+    networks:
+      - n8n-internal
+    # --- CPU LIMIT ADDED ---
+    deploy:
+      resources:
+        limits:
+          # Limit this container to 1.6 CPU cores (80% of 2 total cores)
+          cpus: '1.0'
+
+  vimeo-scraper:
+    build:
+      context: .
+      dockerfile: ./vimeo-scraper/Dockerfile
+    restart: always
+    container_name: vimeo-service
+    volumes:
+      # Mount the shared volume so it can download files there
+      - ./local-files:/files
+    networks:
+      - n8n-internal
+    # --- CPU LIMIT ADDED ---
+    deploy:
+      resources:
+        limits:
+          # Limit this container to 1.6 CPU cores (80% of 2 total cores)
+          cpus: '1.0'
+
+
+volumes:
+  n8n_data:
+
+networks:
+  n8n-internal:
