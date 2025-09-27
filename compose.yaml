@@ -17,6 +17,10 @@ services:
       # THE KEY FIX: This tells n8n to trust the proxy headers from Codespaces
       - N8N_TRUST_PROXY=1
 
+      # --- THE NEW, CRITICAL FIX ---
+      # This tells n8n to allow the browser to connect from this specific URL.
+      - N8N_CORS_ALLOWED_ORIGINS=https://${CODESPACE_NAME}-5678.app.github.dev
+
       - N8N_PORT=5678
       - N8N_PROTOCOL=https
       - N8N_RUNNERS_ENABLED=true
