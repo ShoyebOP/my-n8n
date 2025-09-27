@@ -1,22 +1,19 @@
 {
   "name": "n8n Codespace",
-
-  // 1. Use a standard base image.
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
-
-  // 2. Add the Docker-in-Docker feature.
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   },
 
-  // 3. Run your compose file AFTER the Codespace is fully created.
-  // This is the most important part.
+  // Runs ONLY ONCE after the Codespace is created or rebuilt.
+  // This is the perfect place to do the heavy lifting of building your images.
   "postCreateCommand": "docker-compose -f compose.yaml up -d --build",
 
-  // 4. Keep the container running.
-  "shutdownAction": "none",
+  // Runs EVERY TIME the Codespace starts or resumes.
+  // This command is fast. It just starts your services if they are stopped.
+  "postStartCommand": "docker-compose -f compose.yaml up -d",
 
-  // 5. Forward the n8n port.
+  "shutdownAction": "none",
   "forwardPorts": [5678],
   "portsAttributes": {
     "5678": {
