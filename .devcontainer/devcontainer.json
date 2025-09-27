@@ -11,7 +11,7 @@
 
   // Runs EVERY TIME the Codespace starts or resumes.
   // This command is fast. It just starts your services if they are stopped.
-  "postStartCommand": "docker-compose -f compose.yaml up -d",
+  "postStartCommand": "docker-compose -f compose.yaml up -d --build",
 
   "shutdownAction": "none",
   "forwardPorts": [5678],
