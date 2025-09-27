@@ -8,7 +8,15 @@ services:
     environment:
       - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
       - N8N_HOST=${CODESPACE_NAME}-5678.app.github.dev
-      - N8N_WEBSOCKET_TUNNEL_URL=https://${CODESPACE_NAME}-5678.preview.app.github.dev/
+      # Explicitly set the editor's base URL
+      - N8N_EDITOR_BASE_URL=https://${CODESPACE_NAME}-5678.app.github.dev/
+
+      # Still good practice for WebSocket stability
+      - N8N_WEBSOCKET_TUNNEL_URL=https://${CODESPACE_NAME}-5678.app.github.dev/
+
+      # THE KEY FIX: This tells n8n to trust the proxy headers from Codespaces
+      - N8N_TRUST_PROXY=1
+
       - N8N_PORT=5678
       - N8N_PROTOCOL=https
       - N8N_RUNNERS_ENABLED=true
