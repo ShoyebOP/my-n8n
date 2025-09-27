@@ -8,6 +8,7 @@ services:
     environment:
       - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
       - N8N_HOST=${CODESPACE_NAME}-5678.app.github.dev
+      - N8N_WEBSOCKET_TUNNEL_URL=https://${CODESPACE_NAME}-5678.preview.app.github.dev/
       - N8N_PORT=5678
       - N8N_PROTOCOL=https
       - N8N_RUNNERS_ENABLED=true
