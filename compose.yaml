@@ -1,29 +1,29 @@
-version: "3.8"
-
 services:
   n8n:
     image: docker.n8n.io/n8nio/n8n
     restart: always
-    ports:
-      - "127.0.0.1:5678:5678"
     environment:
-      # --- START: COMMUNITY-VETTED SOLUTION ---
-
-      # 1. This tells n8n its full public address. It is essential.
-      - N8N_PUBLIC_URL=https://${CODESPACE_NAME}-5678.app.github.dev/
-
-      # 2. THE KEY FIX from the community. This tells n8n HOW MANY layers of
-      #    proxies to trust. For Codespaces, '1' is the correct value.
-      - N8N_PROXY_HOPS=1
-
-      # --- Your other settings ---
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+      - N8N_HOST=${SUBDOMAIN}.${DOMAIN_NAME}
       - N8N_PORT=5678
+      - N8N_PROTOCOL=https
+      - N8N_RUNNERS_ENABLED=true
       - NODE_ENV=production
-      - GENERIC_TIMEZONE=Asia/Dhaka
-      - TZ=Asia/Dhaka
+      - WEBHOOK_URL=https://${SUBDOMAIN}.${DOMAIN_NAME}/
+      - GENERIC_TIMEZONE=${GENERIC_TIMEZONE}
+      - TZ=${GENERIC_TIMEZONE}
     volumes:
       - n8n_data:/home/node/.n8n
-      - ./local-files:/home/node/files # Kept your original path
+      - ./local-files:/home/node/files
+    networks:
+      - n8n-internal
+  # This service runs the Cloudflare Tunnel connector.
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: always
+    depends_on:
+      - n8n
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
     networks:
       - n8n-internal
 
@@ -45,10 +45,11 @@ services:
     restart: always
     container_name: ytdlp-service
     volumes:
+      # Mount the shared volume so it can download files there
       - ./local-files:/files
     networks:
       - n8n-internal
-      
+
   puppeteer-service:
     build:
       context: .
@@ -67,9 +68,11 @@ services:
     restart: always
     container_name: vimeo-service
     volumes:
+      # Mount the shared volume so it can download files there
       - ./local-files:/files
     networks:
       - n8n-internal
+
 
 volumes:
   n8n_data:
