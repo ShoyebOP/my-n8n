@@ -16,12 +16,5 @@
   // This command is fast. It just starts your services if they are stopped.
   "postStartCommand": "docker-compose -f compose.yaml up -d --build",
 
-  "shutdownAction": "none",
-  "forwardPorts": [5678],
-  "portsAttributes": {
-    "5678": {
-      "label": "n8n",
-      "onAutoForward": "openBrowser"
-    }
-  }
+  "shutdownAction": "none"
 }
