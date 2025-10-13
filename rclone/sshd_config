@@ -1,0 +1,9 @@
+# rclone-ssh-project/sshd_config
+
+Port 22
+PermitRootLogin yes
+PasswordAuthentication yes
+PubkeyAuthentication no
+ChallengeResponseAuthentication no
+UsePAM yes
+Subsystem sftp /usr/lib/ssh/sftp-server
