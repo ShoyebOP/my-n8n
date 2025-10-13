@@ -18,7 +18,7 @@ services:
       - ./local-files:/home/node/files
     networks:
       - n8n-internal
-  # This service runs the Cloudflare Tunnel connector.
+
   cloudflared:
     image: cloudflare/cloudflared:latest
     restart: always
@@ -46,7 +46,6 @@ services:
     restart: always
     container_name: ytdlp-service
     volumes:
-      # Mount the shared volume so it can download files there
       - ./local-files:/files
     networks:
       - n8n-internal
@@ -69,11 +68,24 @@ services:
     restart: always
     container_name: vimeo-service
     volumes:
-      # Mount the shared volume so it can download files there
       - ./local-files:/files
     networks:
       - n8n-internal
 
+  # --- ADD THE NEW RCLONE SERVICE HERE ---
+  rclone:
+    build:
+      context: .
+      dockerfile: ./rclone/Dockerfile
+      args:
+        - ROOT_PASSWORD=${RCLONE_ROOT_PASSWORD}
+    restart: always
+    container_name: rclone-server
+    volumes:
+      - ./rclone/rclone.conf:/root/.config/rclone/rclone.conf
+      - ./local-files:/files
+    networks:
+      - n8n-internal
 
 volumes:
   n8n_data:
