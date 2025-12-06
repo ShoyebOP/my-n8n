@@ -56,6 +56,72 @@ This repository provides a project structure and setup to run [n8n](https://n8n.
 - **Add more environment variables** as needed for specific services.
 - Each service’s Dockerfile and code can be found in its respective folder.
 
+# Added n8n Codespace Watchdog
+
+[![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=gnu-bash)](YOUR_DOWNLOAD_LINK_HERE)
+
+A smart automation script designed for **Termux (Android)** and **Linux**. It manages your GitHub Codespace running n8n to save costs and automate power management.
+
+### What this script does
+1.  **Smart Startup:** Checks if your Codespace is running. If not, it boots it up, waits for Docker to initialize, and starts your containers.
+2.  **Activity Monitoring:** Connects to your n8n API every 5 minutes to check for **Running** or **Waiting** workflows.
+3.  **Cost Saving:**
+    *   **If Busy:** It keeps the Codespace awake (resets the GitHub idle timer).
+    *   **If Idle:** It counts down a "Grace Period" (e.g., 15 minutes). If no new work appears, it **automatically shuts down** the Codespace to stop your billing usage.
+4.  **SSL Fix:** Includes built-in bypass for Termux SSL certificate issues.
+
+---
+
+### Prerequisites
+
+You need the GitHub CLI (`gh`) and JSON Processor (`jq`) installed.
+
+#### Termux (Android)
+```bash
+pkg update && pkg upgrade
+pkg install gh jq
+```
+
+#### Linux (Debian/Ubuntu)
+```bash
+sudo apt update
+sudo apt install gh jq
+```
+
+---
+
+### Setup & Usage
+
+1.  **Authenticate GitHub:**
+    Run this command and follow the login steps (select **GitHub.com** and **SSH**):
+    ```bash
+    gh auth login
+    ```
+
+2.  **Get the Script:**
+    Download the `n8n_watchdog.sh` file or copy the code.
+
+3.  **Configuration:**
+    Open the script (`nano n8n_watchdog.sh`) and edit the top section:
+    *   `CS_NAME`: Your Codespace name (found via `gh codespace list`).
+    *   `N8N_BASE_URL`: Your n8n link (e.g., `https://n8n.example.com`).
+    *   `N8N_API_KEY`: Your key from n8n Settings > Public API.
+    *   `PROJECT_PATH`: The path to your folder inside the Codespace.
+
+4.  **Make Executable:**
+    ```bash
+    chmod +x n8n_watchdog.sh
+    ```
+
+5.  **Run:**
+    ```bash
+    ./n8n_watchdog.sh
+    ```
+
+### Controls
+*   **Run in Background (Phone):** You can start the script in Termux and switch apps or lock your screen (ensure battery optimization is off for Termux).
+*   **Manual Stop:** Press `q` on your keyboard at any time while the script is waiting to immediately stop the Codespace and exit.
+
 ## Useful Links
 
 - [n8n Documentation](https://docs.n8n.io/)
@@ -68,4 +134,3 @@ MIT
 
 ---
 
-_This README reflects the project structure and required configuration based on the codebase as of this snapshot. For the latest file tree or code, see the [GitHub repo](https://github.com/ShoyebOP/my-n8n)._
