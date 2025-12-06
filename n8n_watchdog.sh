@@ -150,6 +150,9 @@ while true; do
         fi
         idle_streak=0
         
+        # [NEW] Add this line here to see the action:
+        echo -e "${GREEN}[ACTION] Extending Codespace Timer...${NC}"
+        
         # Ping the server so GitHub doesn't put it to sleep while n8n is working.
         send_keep_alive
     else
