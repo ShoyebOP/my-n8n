@@ -95,7 +95,7 @@ sudo apt install gh jq
     ```bash
     gh auth login
     ```
-    You might need to run this command to after that:
+    You might need to run this command too after that:
     ```bash
     gh auth refresh -h github.com -s codespace
     ```
