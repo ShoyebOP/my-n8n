@@ -58,8 +58,6 @@ This repository provides a project structure and setup to run [n8n](https://n8n.
 
 # Added n8n Codespace Watchdog
 
-[![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=gnu-bash)](YOUR_DOWNLOAD_LINK_HERE)
-
 A smart automation script designed for **Termux (Android)** and **Linux**. It manages your GitHub Codespace running n8n to save costs and automate power management.
 
 ### What this script does
@@ -97,16 +95,22 @@ sudo apt install gh jq
     ```bash
     gh auth login
     ```
+    You might need to run this command to after that:
+    ```bash
+    gh auth refresh -h github.com -s codespace
+    ```
 
 2.  **Get the Script:**
     Download the `n8n_watchdog.sh` file or copy the code.
+
+    [![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=gnu-bash)](https://github.com/ShoyebOP/my-n8n/blob/main/n8n_watchdog.sh)
 
 3.  **Configuration:**
     Open the script (`nano n8n_watchdog.sh`) and edit the top section:
     *   `CS_NAME`: Your Codespace name (found via `gh codespace list`).
     *   `N8N_BASE_URL`: Your n8n link (e.g., `https://n8n.example.com`).
     *   `N8N_API_KEY`: Your key from n8n Settings > Public API.
-    *   `PROJECT_PATH`: The path to your folder inside the Codespace.
+    *   `PROJECT_PATH`: The path to your folder inside the Codespace.(use PWD)
 
 4.  **Make Executable:**
     ```bash
