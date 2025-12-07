@@ -1,23 +1,18 @@
 # my-n8n: Run n8n in GitHub Codespaces
 
-This repository provides a project structure and setup to run [n8n](https://n8n.io/)—a powerful workflow automation tool—inside GitHub Codespaces. It is tailored for extensibility using multiple sidecar services (Pandoc, YoutubeDL, Puppeteer, Vimeo Scraper, Rclone) and cloudflared for secure public access.
+This repository provides a project structure and setup to run [n8n](https://n8n.io/)—a powerful workflow automation tool—inside GitHub Codespaces. It is tailored for extensibility using multiple sidecar services YoutubeDL and cloudflared for secure public access.
 
 ## Project Structure
 
 - `compose.yaml` &rarr; Main Docker Compose file orchestrating all services
-- `pandoc-service/` &rarr; Pandoc service for document conversion
 - `ytdlp-service/` &rarr; YoutubeDL service for downloading videos
-- `puppeteer-service/` &rarr; Puppeteer service for HTML/PDF automation
-- `vimeo-scraper/` &rarr; Vimeo scraping scripts
-- `rclone/` &rarr; Rclone server for file sync
 - `local-files/` &rarr; Shared volume for file exchange between services
 
 ## Services Included
 
 - **n8n**: The core automation tool
 - **cloudflared**: Makes Codespaces accessible with secure tunnels
-- **Pandoc, YoutubeDL, Puppeteer, Vimeo Scraper**: Helper services for extra automation
-- **Rclone**: Secure file sync via SSH
+- **YoutubeDL**: Helper services for extra automation
 
 ## Running in GitHub Codespaces
 
@@ -32,21 +27,15 @@ This repository provides a project structure and setup to run [n8n](https://n8n.
    SUBDOMAIN=<your-subdomain>
    GENERIC_TIMEZONE=<e.g. "Asia/Kolkata">
    CLOUDFLARE_TUNNEL_TOKEN=<your-cloudflared-token>
-   RCLONE_ROOT_PASSWORD=<custom-root-password>
    ```
 
    Explanations:
    - `DOMAIN_NAME` & `SUBDOMAIN`: Used to configure n8n’s public URL and webhook endpoints.
    - `GENERIC_TIMEZONE`: Time zone configuration for workflows.
    - `CLOUDFLARE_TUNNEL_TOKEN`: Token for tunnel authentication. ([Cloudflare docs](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/))
-   - `RCLONE_ROOT_PASSWORD`: (for rclone service) Sets the SSH root password for secure access.
 
-3. **Start the services:**  
-   Use Docker Compose to start all:
-   ```bash
-   docker compose up -d
-   ```
-   All services will launch and connect internally. The n8n UI & webhooks will be exposed via cloudflared.
+3. **Create The codespace:**  
+   Just create the codespace on the branch you want.
 
 4. **Access n8n:**  
    Visit `https://<SUBDOMAIN>.<DOMAIN_NAME>/` (or the Codespace-forwarded URL if not using custom domain).
@@ -54,7 +43,7 @@ This repository provides a project structure and setup to run [n8n](https://n8n.
 ## Customization
 
 - **Add more environment variables** as needed for specific services.
-- Each service’s Dockerfile and code can be found in its respective folder.
+- You can add more services like the demo YT-DLP one or even remove it if you want.
 
 # Added n8n Codespace Watchdog
 

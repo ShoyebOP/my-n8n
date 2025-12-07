@@ -28,17 +28,6 @@ services:
     networks:
       - n8n-internal
 
-  pandoc-service:
-    build:
-      context: .
-      dockerfile: ./pandoc-service/Dockerfile
-    restart: always
-    container_name: pandoc-service
-    volumes:
-      - ./local-files:/files
-    networks:
-      - n8n-internal
-
   ytdlp-service:
     build:
       context: .
@@ -46,43 +35,6 @@ services:
     restart: always
     container_name: ytdlp-service
     volumes:
-      - ./local-files:/files
-    networks:
-      - n8n-internal
-
-  puppeteer-service:
-    build:
-      context: .
-      dockerfile: ./puppeteer-service/Dockerfile
-    restart: always
-    container_name: puppeteer-service
-    volumes:
-      - ./local-files:/files
-    networks:
-      - n8n-internal
-
-  vimeo-scraper:
-    build:
-      context: .
-      dockerfile: ./vimeo-scraper/Dockerfile
-    restart: always
-    container_name: vimeo-service
-    volumes:
-      - ./local-files:/files
-    networks:
-      - n8n-internal
-
-  # --- ADD THE NEW RCLONE SERVICE HERE ---
-  rclone:
-    build:
-      context: .
-      dockerfile: ./rclone/Dockerfile
-      args:
-        - ROOT_PASSWORD=${RCLONE_ROOT_PASSWORD}
-    restart: always
-    container_name: rclone-server
-    volumes:
-      - ./rclone/rclone.conf:/root/.config/rclone/rclone.conf
       - ./local-files:/files
     networks:
       - n8n-internal
