@@ -124,6 +124,3 @@ sudo apt install gh jq
 ## License
 
 MIT
-
----
-
