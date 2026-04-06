@@ -1,8 +1,6 @@
 {
-  "name": "n8n codespace",
-  "dockerComposeFile": "compose.yaml",
-  "service": "workspace",
-  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "name": "n8n Codespace",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
 
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {},
@@ -19,9 +17,11 @@
     }
   },
 
-  "postCreateCommand": "mkdir -p local-files",
-  
-  "postStartCommand": "docker compose pull && docker compose up -d && gh codespace ports visibility 5678:public -c $CODESPACE_NAME",
+  // Setup the n8n services after the workspace is ready
+  "postCreateCommand": "mkdir -p local-files && docker compose -f compose.yaml up -d",
 
-  "shutdownAction": "stopCompose"
+  // Update and reset visibility every time the Codespace starts
+  "postStartCommand": "docker compose -f compose.yaml pull && docker compose -f compose.yaml up -d && gh codespace ports visibility 5678:public -c $CODESPACE_NAME",
+
+  "shutdownAction": "none"
 }
