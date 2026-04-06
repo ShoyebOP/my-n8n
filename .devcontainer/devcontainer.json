@@ -1,20 +1,27 @@
 {
   "name": "n8n Codespace",
-  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
+  "dockerComposeFile": "compose.yaml",
+  "service": "n8n",
+  "workspaceFolder": "/workspace",
+
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {},
-    "ghcr.io/devcontainers/features/sshd:1": {
-      "version": "latest"
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+
+  "forwardPorts": [5678],
+
+  "portsAttributes": {
+    "5678": {
+      "label": "n8n UI",
+      "onAutoForward": "openPreview",
+      "visibility": "public" 
     }
   },
 
-  // Runs ONLY ONCE after the Codespace is created or rebuilt.
-  // This is the perfect place to do the heavy lifting of building your images.
-  "postCreateCommand": "docker-compose -f compose.yaml up -d --build",
+  "postCreateCommand": "docker compose up -d",
 
-  // Runs EVERY TIME the Codespace starts or resumes.
-  // This command is fast. It just starts your services if they are stopped.
-  "postStartCommand": "docker-compose -f compose.yaml up -d --build",
+  "postStartCommand": "docker compose pull && docker compose up -d && gh codespace ports visibility 5678:public -c $CODESPACE_NAME",
 
-  "shutdownAction": "none"
+  "shutdownAction": "stopCompose"
 }
