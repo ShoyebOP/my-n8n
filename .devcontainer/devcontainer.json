@@ -2,7 +2,7 @@
   "name": "n8n Codespace",
   "dockerComposeFile": "compose.yaml",
   "service": "n8n",
-  "workspaceFolder": "/workspace/${localWorkspaceFolderBasename}",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
 
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {},
@@ -19,9 +19,9 @@
     }
   },
 
-  "postCreateCommand": "docker compose up -d",
+  "postCreateCommand": "mkdir -p local-files",
 
-  "postStartCommand": "docker compose pull && docker compose up -d && gh codespace ports visibility 5678:public -c $CODESPACE_NAME",
+  "postStartCommand": "docker compose pull && docker compose up -d --build && gh codespace ports visibility 5678:public -c $CODESPACE_NAME",
 
   "shutdownAction": "stopCompose"
 }
