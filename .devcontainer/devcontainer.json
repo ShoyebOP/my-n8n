@@ -2,7 +2,7 @@
   "name": "n8n Codespace",
   "dockerComposeFile": "compose.yaml",
   "service": "n8n",
-  "workspaceFolder": "/workspace",
+  "workspaceFolder": "/workspace/${localWorkspaceFolderBasename}",
 
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {},
