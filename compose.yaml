@@ -1,46 +1,37 @@
 services:
   n8n:
-    image: docker.n8n.io/n8nio/n8n
+    image: docker.n8n.io/n8nio/n8n:latest
     restart: always
+    ports:
+      - "5678:5678"
     environment:
       - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
-      - N8N_HOST=${SUBDOMAIN}.${DOMAIN_NAME}
       - N8N_PORT=5678
-      - N8N_PROTOCOL=https
-      - N8N_RUNNERS_ENABLED=true
-      - NODE_ENV=production
       - N8N_SECURE_COOKIE=false
-      - WEBHOOK_URL=https://${SUBDOMAIN}.${DOMAIN_NAME}/
-      - GENERIC_TIMEZONE=${GENERIC_TIMEZONE}
-      - TZ=${GENERIC_TIMEZONE}
+      # Codespace dynamic URL
+      - WEBHOOK_URL=https://${CODESPACE_NAME}-5678.app.github.dev/
+      - N8N_PROTOCOL=https
+      - NODE_ENV=production
+      # Enable Task Runners for Code Nodes
+      - N8N_RUNNERS_ENABLED=true
+      # Ensure Execute Command is not blocked
+      - N8N_BLOCK_NODES=
+      - GENERIC_TIMEZONE=${GENERIC_TIMEZONE:-UTC}
+      - TZ=${GENERIC_TIMEZONE:-UTC}
     volumes:
       - n8n_data:/home/node/.n8n
       - ./local-files:/home/node/files
-    networks:
-      - n8n-internal
-
-  cloudflared:
-    image: cloudflare/cloudflared:latest
-    restart: always
     depends_on:
-      - n8n
-    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
-    networks:
-      - n8n-internal
+      - n8n-python-runner
 
-  ytdlp-service:
-    build:
-      context: .
-      dockerfile: ./ytdlp-service/Dockerfile
+  # This sidecar allows the "Code" node to run Python
+  n8n-python-runner:
+    image: docker.n8n.io/n8nio/n8n-python:latest
     restart: always
-    container_name: ytdlp-service
+    environment:
+      - N8N_RUNNERS_ENABLED=true
     volumes:
-      - ./local-files:/files
-    networks:
-      - n8n-internal
+      - n8n_data:/home/node/.n8n
 
 volumes:
   n8n_data:
-
-networks:
-  n8n-internal:
