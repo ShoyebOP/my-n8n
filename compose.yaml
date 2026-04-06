@@ -8,13 +8,10 @@ services:
       - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
       - N8N_PORT=5678
       - N8N_SECURE_COOKIE=false
-      # Codespace dynamic URL
       - WEBHOOK_URL=https://${CODESPACE_NAME}-5678.app.github.dev/
       - N8N_PROTOCOL=https
       - NODE_ENV=production
-      # Enable Task Runners for Code Nodes
       - N8N_RUNNERS_ENABLED=true
-      # Ensure Execute Command is not blocked
       - N8N_BLOCK_NODES=
       - GENERIC_TIMEZONE=${GENERIC_TIMEZONE:-UTC}
       - TZ=${GENERIC_TIMEZONE:-UTC}
@@ -24,14 +21,17 @@ services:
     depends_on:
       - n8n-python-runner
 
-  # This sidecar allows the "Code" node to run Python
   n8n-python-runner:
     image: docker.n8n.io/n8nio/n8n-python:latest
     restart: always
     environment:
       - N8N_RUNNERS_ENABLED=true
+      # Persistent path for pip installs
+      - PYTHONUSERBASE=/home/node/.local
     volumes:
       - n8n_data:/home/node/.n8n
+      - python_packages:/home/node/.local
 
 volumes:
   n8n_data:
+  python_packages:
