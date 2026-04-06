@@ -1,36 +1,38 @@
 services:
   n8n:
-    image: docker.n8n.io/n8nio/n8n:latest
+    image: n8nio/n8n:latest
     restart: always
     ports:
       - "5678:5678"
     environment:
-      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
       - N8N_PORT=5678
       - N8N_SECURE_COOKIE=false
       - WEBHOOK_URL=https://${CODESPACE_NAME}-5678.app.github.dev/
       - N8N_PROTOCOL=https
       - NODE_ENV=production
       - N8N_RUNNERS_ENABLED=true
+      - N8N_RUNNERS_MODE=external
+      - N8N_RUNNERS_BROKER_LISTEN_ADDRESS=0.0.0.0
+      - N8N_RUNNERS_AUTH_TOKEN=${N8N_RUNNERS_AUTH_TOKEN:-default-secret-token}
+      - N8N_NATIVE_PYTHON_RUNNER=true
       - N8N_BLOCK_NODES=
       - GENERIC_TIMEZONE=${GENERIC_TIMEZONE:-UTC}
-      - TZ=${GENERIC_TIMEZONE:-UTC}
     volumes:
       - n8n_data:/home/node/.n8n
-      - ./local-files:/home/node/files
-    depends_on:
-      - n8n-python-runner
+      - ../local-files:/home/node/files
 
-  n8n-python-runner:
-    image: docker.n8n.io/n8nio/n8n-python:latest
+  task-runners:
+    image: n8nio/runners:latest
     restart: always
     environment:
-      - N8N_RUNNERS_ENABLED=true
-      # Persistent path for pip installs
+      - N8N_RUNNERS_TASK_BROKER_URI=http://n8n:5679
+      - N8N_RUNNERS_AUTH_TOKEN=${N8N_RUNNERS_AUTH_TOKEN:-default-secret-token}
       - PYTHONUSERBASE=/home/node/.local
     volumes:
       - n8n_data:/home/node/.n8n
       - python_packages:/home/node/.local
+    depends_on:
+      - n8n
 
 volumes:
   n8n_data:
