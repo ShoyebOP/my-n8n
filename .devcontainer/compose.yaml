@@ -1,0 +1,35 @@
+services:
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    restart: always
+    environment:
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+      - N8N_PORT=5678
+      - N8N_SECURE_COOKIE=false
+      - WEBHOOK_URL=https://${CODESPACE_NAME}-5678.app.github.dev/
+      - N8N_PROTOCOL=https
+      - NODE_ENV=production
+      - N8N_RUNNERS_ENABLED=true
+      - N8N_BLOCK_NODES=
+      - GENERIC_TIMEZONE=${GENERIC_TIMEZONE:-UTC}
+      - TZ=${GENERIC_TIMEZONE:-UTC}
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ../local-files:/home/node/files
+    depends_on:
+      - n8n-python-runner
+
+  n8n-python-runner:
+    image: docker.n8n.io/n8nio/n8n-python:latest
+    restart: always
+    environment:
+      - N8N_RUNNERS_ENABLED=true
+      # Persistent path for pip installs
+      - PYTHONUSERBASE=/home/node/.local
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - python_packages:/home/node/.local
+
+volumes:
+  n8n_data:
+  python_packages:
