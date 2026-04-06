@@ -1,8 +1,12 @@
 services:
+  workspace:
+    image: mcr.microsoft.com/devcontainers/base:ubuntu-22.04
+    volumes:
+      - ..:/workspaces/${localWorkspaceFolderBasename}:cached
+    network_mode: service:n8n
+
   n8n:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: docker.n8n.io/n8nio/n8n:latest
     restart: always
     environment:
       - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
