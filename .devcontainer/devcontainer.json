@@ -1,7 +1,7 @@
 {
-  "name": "n8n Codespace",
+  "name": "n8n codespace",
   "dockerComposeFile": "compose.yaml",
-  "service": "n8n",
+  "service": "workspace",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
 
   "features": {
@@ -20,8 +20,8 @@
   },
 
   "postCreateCommand": "mkdir -p local-files",
-
-  "postStartCommand": "docker compose pull && docker compose up -d --build && gh codespace ports visibility 5678:public -c $CODESPACE_NAME",
+  
+  "postStartCommand": "docker compose pull && docker compose up -d && gh codespace ports visibility 5678:public -c $CODESPACE_NAME",
 
   "shutdownAction": "stopCompose"
 }
