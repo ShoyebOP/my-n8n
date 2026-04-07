@@ -16,7 +16,8 @@ services:
       - N8N_RUNNERS_AUTH_TOKEN=${N8N_RUNNERS_AUTH_TOKEN:-default-secret-token}
       - N8N_NATIVE_PYTHON_RUNNER=true
       - N8N_PROXY_HOPS=1
-      - N8N_PUSH_BACKEND=polling
+      - N8N_PUSH_BACKEND=sse
+      - N8N_EDITOR_BASE_URL=${WEBHOOK_URL:-https://localhost:5678/}
       - N8N_BLOCK_NODES=
       - GENERIC_TIMEZONE=${GENERIC_TIMEZONE:-UTC}
     volumes:
