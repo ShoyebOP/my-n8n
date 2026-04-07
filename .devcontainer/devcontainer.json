@@ -1,14 +1,14 @@
 {
   "name": "n8n Codespace",
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
-
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/sshd:1": {},
     "ghcr.io/devcontainers/features/github-cli:1": {}
   },
-
-  "forwardPorts": [5678],
-
+  "forwardPorts": [
+    5678
+  ],
   "portsAttributes": {
     "5678": {
       "label": "n8n UI",
@@ -17,12 +17,9 @@
       "protocol": "https"
     }
   },
-
   // Setup the n8n services after the workspace is ready
   "postCreateCommand": "mkdir -p local-files && docker compose -f compose.yaml up -d",
-
   // Update and reset visibility every time the Codespace starts
   "postStartCommand": "docker compose -f compose.yaml pull && docker compose -f compose.yaml up -d && gh codespace ports visibility 5678:public -c $CODESPACE_NAME",
-
   "shutdownAction": "none"
 }
