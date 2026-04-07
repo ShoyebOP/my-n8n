@@ -13,7 +13,8 @@
     "5678": {
       "label": "n8n UI",
       "onAutoForward": "openPreview",
-      "visibility": "public" 
+      "visibility": "public",
+      "protocol": "https"
     }
   },
 
