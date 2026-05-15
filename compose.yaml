@@ -1,42 +1,40 @@
 services:
   n8n:
-    image: n8nio/n8n:latest
+    image: docker.n8n.io/n8nio/n8n:latest
     restart: always
-    ports:
-      - "5678:5678"
     environment:
+      - N8N_HOST=${N8N_HOST}
       - N8N_PORT=5678
-      - N8N_SECURE_COOKIE=false
-      - WEBHOOK_URL=https://${CODESPACE_NAME}-5678.app.github.dev/
       - N8N_PROTOCOL=https
       - NODE_ENV=production
+      - WEBHOOK_URL=https://${N8N_HOST}/
+      - N8N_EDITOR_BASE_URL=https://${N8N_HOST}/
+      - N8N_SECURE_COOKIE=true
       - N8N_RUNNERS_ENABLED=true
-      - N8N_RUNNERS_MODE=external
-      - N8N_RUNNERS_BROKER_LISTEN_ADDRESS=0.0.0.0
-      - N8N_RUNNERS_AUTH_TOKEN=${N8N_RUNNERS_AUTH_TOKEN:-default-secret-token}
-      - N8N_NATIVE_PYTHON_RUNNER=true
-      - N8N_PROXY_HOPS=1
-      - N8N_PUSH_BACKEND=sse
-      - N8N_EDITOR_BASE_URL=${WEBHOOK_URL:-https://localhost:5678/}
-      - N8N_BLOCK_NODES=
       - GENERIC_TIMEZONE=${GENERIC_TIMEZONE:-UTC}
+      - TZ=${GENERIC_TIMEZONE:-UTC}
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+      - N8N_COMMUNITY_PACKAGES_ENABLED=true
+      - NODES_EXCLUDE=[]
+      - NODE_FUNCTION_ALLOW_BUILTIN=*
+      - NODE_FUNCTION_ALLOW_EXTERNAL=*
     volumes:
-      - n8n_data:/home/node/.n8n
-      - ../local-files:/home/node/files
+      - ./.n8n:/home/node/.n8n
+      - ./local-files:/home/node/files
+    networks:
+      - internal
 
-  task-runners:
-    image: n8nio/runners:latest
+  cloudflared:
+    image: cloudflare/cloudflared:latest
     restart: always
+    command: tunnel run
     environment:
-      - N8N_RUNNERS_TASK_BROKER_URI=http://n8n:5679
-      - N8N_RUNNERS_AUTH_TOKEN=${N8N_RUNNERS_AUTH_TOKEN:-default-secret-token}
-      - PYTHONUSERBASE=/home/node/.local
-    volumes:
-      - n8n_data:/home/node/.n8n
-      - python_packages:/home/node/.local
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
     depends_on:
       - n8n
+    networks:
+      - internal
 
-volumes:
-  n8n_data:
-  python_packages:
+networks:
+  internal:
+    driver: bridge

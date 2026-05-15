@@ -1,125 +1,81 @@
-# my-n8n: Run n8n in GitHub Codespaces
+# n8n Docker Setup with Cloudflare Tunnel
 
-This repository provides a project structure and setup to run [n8n](https://n8n.io/)—a powerful workflow automation tool—inside GitHub Codespaces. It is tailored for extensibility using multiple sidecar services YoutubeDL and cloudflared for secure public access.
+Self-hosted [n8n](https://n8n.io/) running in Docker, accessible via [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/). No ports exposed on the host.
 
 ## Project Structure
 
-- `compose.yaml` &rarr; Main Docker Compose file orchestrating all services
-- `ytdlp-service/` &rarr; YoutubeDL service for downloading videos
-- `local-files/` &rarr; Shared volume for file exchange between services
+- `compose.yaml` — Docker Compose file with n8n and cloudflared services
+- `.env.example` — Template for required environment variables
+- `.n8n/` — n8n data directory (database, credentials, workflows) — gitignored
+- `local-files/` — Shared volume for file exchange with workflows
 
-## Services Included
+## Quick Start
 
-- **n8n**: The core automation tool
-- **cloudflared**: Makes Codespaces accessible with secure tunnels
-- **YoutubeDL**: Helper services for extra automation
-
-## Running in GitHub Codespaces
-
-1. **Fork this repo** and open it in a new Codespace.
-2. **Set required environment variables.**  
-   These must be configured before starting the Codespace to ensure all services work, particularly cloudflared and rclone.  
-   Suggested way: Add these variables in your Codespace creation dialog (or in `.env` file).
-
-   **Environment variables to set:**
-   ```
-   DOMAIN_NAME=<your-domain.com>
-   SUBDOMAIN=<your-subdomain>
-   GENERIC_TIMEZONE=<e.g. "Asia/Kolkata">
-   CLOUDFLARE_TUNNEL_TOKEN=<your-cloudflared-token>
+1. **Copy the env template and fill in your values:**
+   ```bash
+   cp .env.example .env
    ```
 
-   Explanations:
-   - `DOMAIN_NAME` & `SUBDOMAIN`: Used to configure n8n’s public URL and webhook endpoints.
-   - `GENERIC_TIMEZONE`: Time zone configuration for workflows.
-   - `CLOUDFLARE_TUNNEL_TOKEN`: Token for tunnel authentication. ([Cloudflare docs](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/))
+2. **Configure `.env`:**
+   ```
+   N8N_HOST=n8n.yourdomain.com
+   CLOUDFLARE_TUNNEL_TOKEN=your-tunnel-token
+   GENERIC_TIMEZONE=Asia/Dhaka
+   ```
 
-3. **Create The codespace:**  
-   Just create the codespace on the branch you want.
+3. **Set up your Cloudflare Tunnel:**
+   - Go to [Cloudflare Zero Trust](https://one.dash.cloudflare.com/) > Networks > Tunnels
+   - Create a tunnel and copy the token to `.env`
+   - Add a public hostname pointing to `http://n8n:5678`
 
-4. **Access n8n:**  
-   Visit `https://<SUBDOMAIN>.<DOMAIN_NAME>/` (or the Codespace-forwarded URL if not using custom domain).
+4. **Start the services:**
+   ```bash
+   docker compose up -d
+   ```
 
-## Customization
+5. **Access n8n** at `https://n8n.yourdomain.com/`
 
-- **Add more environment variables** as needed for specific services.
-- You can add more services like the demo YT-DLP one or even remove it if you want.
+## Environment Variables
 
-# Added n8n Codespace Watchdog
+| Variable | Description |
+|----------|-------------|
+| `N8N_HOST` | Your n8n domain (configured in Cloudflare tunnel) |
+| `CLOUDFLARE_TUNNEL_TOKEN` | Tunnel authentication token |
+| `GENERIC_TIMEZONE` | Timezone for workflows (default: `UTC`) |
 
-A smart automation script designed for **Termux (Android)** and **Linux**. It manages your GitHub Codespace running n8n to save costs and automate power management.
+## Services
 
-### What this script does
-1.  **Smart Startup:** Checks if your Codespace is running. If not, it boots it up, waits for Docker to initialize, and starts your containers.
-2.  **Activity Monitoring:** Connects to your n8n API every 5 minutes to check for **Running** or **Waiting** workflows.
-3.  **Cost Saving:**
-    *   **If Busy:** It keeps the Codespace awake (resets the GitHub idle timer).
-    *   **If Idle:** It counts down a "Grace Period" (e.g., 15 minutes). If no new work appears, it **automatically shuts down** the Codespace to stop your billing usage.
-4.  **SSL Fix:** Includes built-in bypass for Termux SSL certificate issues.
+- **n8n** — Workflow automation, accessible only via internal Docker network
+- **cloudflared** — Cloudflare tunnel connector, only service exposed to the internet
 
----
+## Node Availability
 
-### Prerequisites
+All built-in nodes are enabled, including:
+- Execute Command (shell access)
+- SSH
+- Read/Write File
+- Local File Trigger
 
-You need the GitHub CLI (`gh`) and JSON Processor (`jq`) installed.
+Community nodes can be installed from the n8n UI.
 
-#### Termux (Android)
+## Data Migration (from npm install)
+
+If you had n8n installed via npm, the data in `~/.n8n/` (or `~/n8n-data/.n8n/`) can be directly bind-mounted into the container. The `compose.yaml` mounts `./.n8n` which contains the SQLite database, encryption key, workflows, and credentials.
+
+To migrate:
 ```bash
-pkg update && pkg upgrade
-pkg install gh jq
+cp -r ~/n8n-data/.n8n ./.n8n
+docker compose up -d
 ```
 
-#### Linux (Debian/Ubuntu)
-```bash
-sudo apt update
-sudo apt install gh jq
-```
-
----
-
-### Setup & Usage
-
-1.  **Authenticate GitHub:**
-    Run this command and follow the login steps (select **GitHub.com** and **SSH**):
-    ```bash
-    gh auth login
-    ```
-    You might need to run this command too after that:
-    ```bash
-    gh auth refresh -h github.com -s codespace
-    ```
-
-2.  **Get the Script:**
-    Download the `n8n_watchdog.sh` file or copy the code.
-
-    [![Download Script](https://img.shields.io/badge/Download-Script-blue?style=for-the-badge&logo=gnu-bash)](https://github.com/ShoyebOP/my-n8n/blob/main/n8n_watchdog.sh)
-
-3.  **Configuration:**
-    Open the script (`nano n8n_watchdog.sh`) and edit the top section:
-    *   `CS_NAME`: Your Codespace name (found via `gh codespace list`).
-    *   `N8N_BASE_URL`: Your n8n link (e.g., `https://n8n.example.com`).
-    *   `N8N_API_KEY`: Your key from n8n Settings > Public API.
-    *   `PROJECT_PATH`: The path to your folder inside the Codespace.(use PWD)
-
-4.  **Make Executable:**
-    ```bash
-    chmod +x n8n_watchdog.sh
-    ```
-
-5.  **Run:**
-    ```bash
-    ./n8n_watchdog.sh
-    ```
-
-### Controls
-*   **Run in Background (Phone):** You can start the script in Termux and switch apps or lock your screen (ensure battery optimization is off for Termux).
-*   **Manual Stop:** Press `q` on your keyboard at any time while the script is waiting to immediately stop the Codespace and exit.
+Your encryption key, workflows, and credentials will be preserved.
 
 ## Useful Links
 
 - [n8n Documentation](https://docs.n8n.io/)
+- [n8n Docker Installation](https://docs.n8n.io/hosting/installation/docker/)
 - [Cloudflare Tunnel Setup](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/)
-- [GitHub Codespaces Docs](https://docs.github.com/codespaces)
+- [n8n Environment Variables](https://docs.n8n.io/hosting/configuration/environment-variables/)
 
 ## License
 
